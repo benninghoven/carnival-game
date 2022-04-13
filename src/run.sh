@@ -1,1 +1,1 @@
-sudo python3 example.py
+sudo python3 main.py

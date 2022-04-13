@@ -38,7 +38,19 @@ class Strip():
         for x in range(0,self.LED_COUNT):
             self.strip.setPixelColor(x,Color(255,0,0))
 
-    def Visualize(self,color = Color(255,0,0)):
+    def Visualize(self,color = 1):
+
+        if color == 1:
+            color = Color(255,0,0)
+        elif color == 2:
+            color = Color(0,255,0)
+        elif color == 3:
+            color = Color(0,0,255)
+        elif color == 4:
+            color = Color(148,143,143)
+        else:
+            color = Color(255,0,0)
+
         for x in range(0,self.LED_COUNT):
             if self.dict[x]:
                 self.strip.setPixelColor(x,color)
@@ -69,15 +81,3 @@ class Strip():
 
 
 
-
-
-
-bob = Strip()
-bob.Test()
-#print(bob)
-
-
-for i in range(0,100):
-    time.sleep(.5)
-    bob.Surge(i)
-    bob.Visualize()
