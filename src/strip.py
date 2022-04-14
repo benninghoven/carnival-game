@@ -88,7 +88,6 @@ class Strip():
                     self.dict[i] = False
 
     def AllTrue(self):
-        print("Setting every pixel to true")
         for i in range(0,self.LED_COUNT):
             if not self.dict[i]:
                 self.dict[i] = True
@@ -100,8 +99,6 @@ class Strip():
         percents = []
         for i in range(0,size):
             percents.append(int((i/size) * 100))
-        for x in percents:
-            print(x)
         while time.time() < t_end:
             for i in range(0,self.LED_COUNT):
                 if i <= percents[1]:
@@ -135,7 +132,12 @@ class Strip():
                 self.dict[i] = not self.dict[i]
             time.sleep(0.25)
             self.Visualize(3)
-
+    def Off(self):
+        self.AllTrue
+        for i in range(0,self.LED_COUNT):
+            self.strip.setPixelColor(i, Color(0,0,0))
+        self.strip.show() # show is refresh
+            
 
         
 
