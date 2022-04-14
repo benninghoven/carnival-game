@@ -1,6 +1,16 @@
 from rpi_ws281x import *
 import time
 
+colors = {
+        "red" : Color(255,0,0),
+        "orange" : Color(255,165,0),
+        "yellow" : Color(255,255,0),
+        "green" : Color(0,128,0),
+        "blue" : Color(0,0,255),
+        "purple" : Color(75,0,130),
+        "pink" : Color(238,130,238)
+        }
+
 class Strip():
 
     def __init__(self):
@@ -76,6 +86,58 @@ class Strip():
             else:
                 if self.dict[i]:
                     self.dict[i] = False
+
+    def AllTrue(self):
+        print("Setting every pixel to true")
+        for i in range(0,self.LED_COUNT):
+            if not self.dict[i]:
+                self.dict[i] = True
+
+    def Rainbow(self, duration):
+        self.AllTrue()
+        t_end = time.time() + duration # 10 seconds
+        size = len(colors)
+        percents = []
+        for i in range(0,size):
+            percents.append(int((i/size) * 100))
+        for x in percents:
+            print(x)
+        while time.time() < t_end:
+            for i in range(0,self.LED_COUNT):
+                if i <= percents[1]:
+                    self.strip.setPixelColor(i, colors["red"])
+                elif i <= percents[2]:
+                    self.strip.setPixelColor(i, colors["orange"])
+                elif i <= percents[3]:
+                    self.strip.setPixelColor(i, colors["yellow"])
+                elif i <= percents[4]:
+                    self.strip.setPixelColor(i, colors["green"])
+                elif i <= percents[5]:
+                    self.strip.setPixelColor(i, colors["blue"])
+                elif i <= percents[6]:
+                    self.strip.setPixelColor(i, colors["purple"])
+                else:
+                    self.strip.setPixelColor(i, colors["pink"])
+
+            self.strip.show() # show is refresh
+
+    def Barber(self, duration): 
+        self.AllTrue()
+        for i in range(0,self.LED_COUNT):
+            if i % 2:
+                self.dict[i] = True
+            else:
+                self.dict[i] = False 
+
+        t_end = time.time() + duration # 10 seconds
+        while time.time() < t_end:
+            for i in range(0,self.LED_COUNT):
+                self.dict[i] = not self.dict[i]
+            time.sleep(0.25)
+            self.Visualize(3)
+
+
+        
 
 
 
