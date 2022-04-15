@@ -1,26 +1,33 @@
+import numpy as np
+import sounddevice as sd
 from rpi_ws281x import *
 import time
 
-colors = {
+
+DEBUG = True
+COLORS = {
         "red" : Color(255,0,0),
         "orange" : Color(255,165,0),
         "yellow" : Color(255,255,0),
         "green" : Color(0,128,0),
         "blue" : Color(0,0,255),
         "purple" : Color(75,0,130),
-        "pink" : Color(238,130,238)
+        "pink" : Color(238,130,238),
+        "death" : Color(0,0,0)
         }
 
-class Strip():
-
+class Screamer():
     def __init__(self):
-        self.debug = True 
+        # Mic
+        self.maxVolume = 277
+        self.volumeList = []
+        # RGBStrip
         self.LED_COUNT      = 100      # Number of LED pixels.
         self.LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
         self.LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
         self.LED_DMA        = 10      # DMA channel to use for generating signal (try 10)
         self.LED_BRIGHTNESS = 255     # Set to 0 for darkest and 255 for brightest
-        if self.debug:
+        if DEBUG:
             self.LED_BRIGHTNESS = 5
         self.LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
         self.LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
@@ -37,19 +44,33 @@ class Strip():
         for x in range(0, self.LED_COUNT):
             self.dict[x] = True
         self.strip.begin()
+    
+    def ScoreToPercent(self,score):
+        return int((score / self.maxVolume) * 100)
+        
+    def AudioCallBack(self, inData, frames, time, status):
+        volume = int(np.linalg.norm(inData) * 10)
+        self.volumeList.append(volume)
+        percentageScore = int((volume / self.maxVolume) * 100)
+        if DEBUG:
+            print(f"{volume} {percentageScore}%")
 
-        self.SetRed()
 
+    def Listen(self, duration = 3):
+        stream = sd.InputStream(callback=self.AudioCallBack)
+        with stream:
+            sd.sleep(duration * 1000)
+        self.volumeList.sort()
+        highestScore = self.volumeList[-1]
+        self.volumeList = [] # clear it for the next user
+        #return self.ScoreToPercent(highestScore)
+        return highestScore 
 
     def __str__(self):
         return str(self.dict)
 
-    def SetRed(self):
-        for x in range(0,self.LED_COUNT):
-            self.strip.setPixelColor(x,Color(255,0,0))
-
     def Visualize(self,color = "red"):
-        color = colors[color]
+        color = COLORS[color]
         for x in range(0,self.LED_COUNT):
             if self.dict[x]:
                 self.strip.setPixelColor(x,color)
@@ -57,13 +78,7 @@ class Strip():
                 self.strip.setPixelColor(x,Color(0,0,0))
         self.strip.show() # show is refresh
 
-    def Test(self):
-        print("TESTING")
-        for x in range(0,100):
-            if x > 80:
-                self.dict[x] = False
-    
-    def Surge(self,val):
+    def Surge(self,val = 0):
         if val < 0:
             val = 0
         elif val > 100:
@@ -76,56 +91,80 @@ class Strip():
                 if self.dict[i]:
                     self.dict[i] = False
 
-    def AllTrue(self):
+    def SetLightsAllTrue(self):
         for i in range(0,self.LED_COUNT):
             if not self.dict[i]:
                 self.dict[i] = True
 
-    def Rainbow(self, duration):
-        self.AllTrue()
+    def SetLightsAllFalse(self):
+        for i in range(0,self.LED_COUNT):
+            if self.dict[i]:
+                self.dict[i] = False
+
+    def Rainbow(self, duration = 3):
+        self.SetLightsAllTrue()
         t_end = time.time() + duration # 10 seconds
-        size = len(colors)
+        size = len(COLORS)
         percents = []
         for i in range(0,size):
             percents.append(int((i/size) * 100))
         while time.time() < t_end:
             for i in range(0,self.LED_COUNT):
                 if i <= percents[1]:
-                    self.strip.setPixelColor(i, colors["red"])
+                    self.strip.setPixelColor(i, COLORS["red"])
                 elif i <= percents[2]:
-                    self.strip.setPixelColor(i, colors["orange"])
+                    self.strip.setPixelColor(i, COLORS["orange"])
                 elif i <= percents[3]:
-                    self.strip.setPixelColor(i, colors["yellow"])
+                    self.strip.setPixelColor(i, COLORS["yellow"])
                 elif i <= percents[4]:
-                    self.strip.setPixelColor(i, colors["green"])
+                    self.strip.setPixelColor(i, COLORS["green"])
                 elif i <= percents[5]:
-                    self.strip.setPixelColor(i, colors["blue"])
+                    self.strip.setPixelColor(i, COLORS["blue"])
                 elif i <= percents[6]:
-                    self.strip.setPixelColor(i, colors["purple"])
+                    self.strip.setPixelColor(i, COLORS["purple"])
                 else:
-                    self.strip.setPixelColor(i, colors["pink"])
+                    self.strip.setPixelColor(i, COLORS["pink"])
 
             self.strip.show() # show is refresh
 
-    def Barber(self, duration): 
-        self.AllTrue()
+    def TurnLightsOff(self):
+        self.SetLightsAllTrue
         for i in range(0,self.LED_COUNT):
-            if i % 2:
-                self.dict[i] = True
-            else:
-                self.dict[i] = False 
+            if self.dict[i]:
+                self.strip.setPixelColor(i, Color(0,0,0))
+        self.strip.show()
 
-        t_end = time.time() + duration # 10 seconds
-        while time.time() < t_end:
-            for i in range(0,self.LED_COUNT):
-                self.dict[i] = not self.dict[i]
-            time.sleep(0.25)
-            self.Visualize(3)
-    def Off(self):
-        self.AllTrue
-        for i in range(0,self.LED_COUNT):
-            self.strip.setPixelColor(i, Color(0,0,0))
-        self.strip.show() # show is refresh
+    def StartCountDown(self,countDownTime = 1):
+        self.SetLightsAllTrue()
+        quarters = [25,50,75,100]
+        color = "red"
+        for i in range(0,4):
+            print("BEEP")
+            for j in range(0,self.LED_COUNT):
+                if j > 75:
+                    color = "green"
+                else:
+                    color = "red"
+
+                if j <= quarters[i]:
+                    self.strip.setPixelColor(j, COLORS[color])
+                else:
+                    self.strip.setPixelColor(j, COLORS["death"])
+
+            self.strip.show()
+            time.sleep(countDownTime)
+
+
+    def Play(self, name = "Kyle"):
+        print(f"{name} started playing")
+        self.StartCountDown()
+        self.Rainbow()
+        highScore = self.Listen()
+        print(highScore)
+        self.TurnLightsOff()
+
+
+
             
 
         

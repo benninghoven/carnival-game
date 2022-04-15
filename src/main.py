@@ -1,18 +1,25 @@
-from strip import Strip
-from mic import Mic
+#from strip import Strip
+#from mic import Mic
+from screamer import Screamer
 
 #s = Strip()
 #s.Rainbow(10)
-#s.Barber(10)
 #s.Off()
+#s.StartCountDown()
 
+#exit()
+
+"""
 mic = Mic()
 print("user 1 ")
 print(mic.Listen())
-print("user 2 ")
-print(mic.Listen())
+"""
+
+s = Screamer()
+s.Play()
 
 exit()
+
 
 def UserStandBack(feet):
     print(f"telling user to stand back {feet} feet")
