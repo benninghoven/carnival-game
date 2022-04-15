@@ -1,11 +1,11 @@
 from strip import Strip
 
-"""
 s = Strip()
 s.Rainbow(10)
-s.Barber(10)
+#s.Barber(10)
 s.Off()
-"""
+
+exit()
 
 def UserStandBack(feet):
     print(f"telling user to stand back {feet} feet")

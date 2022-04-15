@@ -14,7 +14,7 @@ colors = {
 class Strip():
 
     def __init__(self):
-        self.debug = True
+        self.debug = True 
         self.LED_COUNT      = 100      # Number of LED pixels.
         self.LED_PIN        = 18      # GPIO pin connected to the pixels (18 uses PWM!).
         self.LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
@@ -48,19 +48,8 @@ class Strip():
         for x in range(0,self.LED_COUNT):
             self.strip.setPixelColor(x,Color(255,0,0))
 
-    def Visualize(self,color = 1):
-
-        if color == 1:
-            color = Color(255,0,0)
-        elif color == 2:
-            color = Color(0,255,0)
-        elif color == 3:
-            color = Color(0,0,255)
-        elif color == 4:
-            color = Color(148,143,143)
-        else:
-            color = Color(255,0,0)
-
+    def Visualize(self,color = "red"):
+        color = colors[color]
         for x in range(0,self.LED_COUNT):
             if self.dict[x]:
                 self.strip.setPixelColor(x,color)
