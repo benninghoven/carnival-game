@@ -1,9 +1,16 @@
 from strip import Strip
+from mic import Mic
 
-s = Strip()
-s.Rainbow(10)
+#s = Strip()
+#s.Rainbow(10)
 #s.Barber(10)
-s.Off()
+#s.Off()
+
+mic = Mic()
+print("user 1 ")
+print(mic.Listen())
+print("user 2 ")
+print(mic.Listen())
 
 exit()
 
