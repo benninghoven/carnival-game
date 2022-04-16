@@ -1,45 +1,53 @@
-#from strip import Strip
-#from mic import Mic
-from screamer import Screamer
+from screamer import *
+import RPi.GPIO as GPIO
 
-#s = Strip()
-#s.Rainbow(10)
-#s.Off()
-#s.StartCountDown()
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+TRIG = 4
+ECHO = 18
+GPIO.setup(TRIG,GPIO.OUT)
+GPIO.setup(ECHO,GPIO.IN)
 
-#exit()
+def Destroy():
+    GPIO.cleanup
+    print("destroyed")
 
-"""
-mic = Mic()
-print("user 1 ")
-print(mic.Listen())
-"""
+def GetDistance():
+    GPIO.output(TRIG, True)
+    time.sleep(0.00001)
+    GPIO.output(TRIG, False)
+
+    while GPIO.input(ECHO) == False:
+        start = time.time()
+
+    while GPIO.input(ECHO) == True:
+        end = time.time()
+
+    sig_time = end-start
+
+    distance = sig_time / 0.000148
+    return int(distance)
+
+def StandBack():
+    print("Standing User Back")
+    for i in range(0,10):
+        print(GetDistance())
+        time.sleep(.1)
+
 
 s = Screamer()
-s.Play()
 
+Destroy()
+
+StandBack()
+Destroy()
 exit()
 
-
-def UserStandBack(feet):
-    print(f"telling user to stand back {feet} feet")
-
-def PlayGame():
-    while True:
-        print("playing game")
-        UserStandBack(5)
-        break
-
-def ViewLeaderboard():
-    while True:
-        print("viewing leaderboard")
-        break
-
 while True:
-    userInput = input("1) Play Game\n2) View Leaderboard\n")
-    if userInput == "1":
-        PlayGame()
-    elif userInput == "2":
-        ViewLeaderboard()
-    else:
-        continue
+    name = input("enter name\n")
+    if name == "blake":
+        break
+    StandBack()
+    s.Play(name)
+
+Destroy()

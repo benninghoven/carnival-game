@@ -158,9 +158,7 @@ class Screamer():
     def Play(self, name = "Kyle"):
         print(f"{name} started playing")
         self.StartCountDown()
-        self.Rainbow()
         highScore = self.Listen()
-        print(highScore)
         self.TurnLightsOff()
 
 
@@ -168,6 +166,7 @@ class Screamer():
             
 
         
+
 
 
 
