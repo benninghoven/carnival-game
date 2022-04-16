@@ -1,16 +1,19 @@
 from screamer import *
 import RPi.GPIO as GPIO
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
 TRIG = 4
-ECHO = 18
-GPIO.setup(TRIG,GPIO.OUT)
-GPIO.setup(ECHO,GPIO.IN)
+ECHO = 17
+
+def SetupGPIO():
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setwarnings(False)
+    GPIO.setup(TRIG,GPIO.OUT)
+    GPIO.setup(ECHO,GPIO.IN)
 
 def Destroy():
     GPIO.cleanup
-    print("destroyed")
+    print("\n💥 destroyed")
+    exit()
 
 def GetDistance():
     GPIO.output(TRIG, True)
@@ -34,20 +37,16 @@ def StandBack():
         print(GetDistance())
         time.sleep(.1)
 
-
+SetupGPIO()
 s = Screamer()
 
-Destroy()
-
-StandBack()
-Destroy()
-exit()
-
 while True:
-    name = input("enter name\n")
-    if name == "blake":
-        break
-    StandBack()
-    s.Play(name)
-
-Destroy()
+    try:
+        name = input("enter name\n")
+        if name == "blake":
+            break
+        StandBack()
+        bob = s.Play(name)
+        print(bob)
+    except KeyboardInterrupt:
+        Destroy()

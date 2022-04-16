@@ -159,7 +159,9 @@ class Screamer():
         print(f"{name} started playing")
         self.StartCountDown()
         highScore = self.Listen()
+        print(f"highscore: {highScore}")
         self.TurnLightsOff()
+        return {name,highScore}
 
 
 
