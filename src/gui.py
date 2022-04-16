@@ -1,4 +1,5 @@
 from guizero import App, Text, TextBox, PushButton, Combo
+from time import sleep
 import re
 
 def start_game():
@@ -10,8 +11,10 @@ def start_game():
     #MAKE THIS BITCH OPEN A FILE AND SAVE NAME IN IT
     #MAKE SURE NAME DOES NOT ALREADY EXIST
 
+def counter():
+    bitch.value = int(bitch.value) + 1
+
 def show_leaderboard():
-    game.hide()
     leaderboard.hide()
     stats_file = open("stats.txt", "r")
     stats = stats_file.readlines()
@@ -22,8 +25,15 @@ def show_leaderboard():
     second = Text(app, "2nd - " + stats[1], color="#C0C0C0", bg="black")
     third = Text(app, "3rd - " + stats[2], color="#CD7F32", bg="black")
     stats_file.close()
+    bitch = Text(app, text="0", visible=False)
+    bitch.repeat(1000,counter)
+    print(game.value)
+    if game.value == 1 :
+        first.hide()
+        second.hide()
+        third.hide()
 
-
+"""
 def add_name(new_name): #Add function that adds name to file
     #names_file = open("names.txt", "a")
     #names_file.write(new_name.value) 
@@ -40,29 +50,27 @@ def add_name(new_name): #Add function that adds name to file
         f.write(new_name.value)
         print(f"wrote new name {new_name.value}")
     print("ADD NAME FINISHED")
-        
+
+"""    
 
 
 def play_game():
     game.hide()
     leaderboard.hide()
-    new_name = TextBox(app)
-    add = PushButton(app, command=add_name(new_name), text="Add New Name")
+    #new_name = TextBox(app)
+    #add = PushButton(app, command=add_name(new_name), text="Add New Name")
     with open("names.txt", "r") as f:
         names = [line.strip() for line in f]
     namesDropDownMenu = Combo(app, options=names)
     begin = PushButton(app, command=start_game, text="Start Screaming")  
+    
 
 
 
 
 app = App(title="Throater")
-print("A")
 welcome_message = Text(app, text="Scream at a bitch", size=40, font="Times New Roman", color="red") 
-print("B")
 game = PushButton(app, command=play_game, text="Play game")
-print("C")
 leaderboard = PushButton(app, command=show_leaderboard, text="Leaderboard")
-print("D")
 #display_leaderboard = PushButton(app, command=show_leaderboard, text="Leaderboard")
 app.display()

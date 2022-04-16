@@ -52,6 +52,8 @@ class Screamer():
         volume = int(np.linalg.norm(inData) * 10)
         self.volumeList.append(volume)
         percentageScore = int((volume / self.maxVolume) * 100)
+        self.Surge(percentageScore)
+        self.Visualize()
         if DEBUG:
             print(f"{volume} {percentageScore}%")
 
@@ -145,12 +147,10 @@ class Screamer():
                     color = "green"
                 else:
                     color = "red"
-
                 if j <= quarters[i]:
                     self.strip.setPixelColor(j, COLORS[color])
                 else:
                     self.strip.setPixelColor(j, COLORS["death"])
-
             self.strip.show()
             time.sleep(countDownTime)
 
@@ -161,7 +161,10 @@ class Screamer():
         highScore = self.Listen()
         print(f"highscore: {highScore}")
         self.TurnLightsOff()
-        return {name,highScore}
+        return {
+            "name": name,
+            "score": highScore
+                }
 
 
 

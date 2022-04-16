@@ -19,13 +19,11 @@ def GetDistance():
     GPIO.output(TRIG, True)
     time.sleep(0.00001)
     GPIO.output(TRIG, False)
-
     while GPIO.input(ECHO) == False:
         start = time.time()
 
     while GPIO.input(ECHO) == True:
         end = time.time()
-
     sig_time = end-start
 
     distance = sig_time / 0.000148
@@ -33,8 +31,22 @@ def GetDistance():
 
 def StandBack():
     print("Standing User Back")
-    for i in range(0,10):
-        print(GetDistance())
+    minDistance= 2
+    maxDistance = 90
+    combo = 3
+    counter = 0
+    tempy = 0
+    while True:
+        distance = GetDistance()
+        print(f"{distance}")
+        if distance <= maxDistance and distance >= minDistance:
+            counter += 1
+            print(f"COMBO {counter}")
+        else:
+            counter = 0
+
+        if counter >= combo:
+            break
         time.sleep(.1)
 
 SetupGPIO()
@@ -46,7 +58,8 @@ while True:
         if name == "blake":
             break
         StandBack()
-        bob = s.Play(name)
-        print(bob)
+        nameScoreDict = s.Play(name)
+        print(nameScoreDict["name"])
+        print(nameScoreDict["score"])
     except KeyboardInterrupt:
         Destroy()
