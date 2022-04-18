@@ -4,7 +4,7 @@ from rpi_ws281x import *
 import time
 
 
-DEBUG = True
+DEBUG = False
 COLORS = {
         "red" : Color(255,0,0),
         "orange" : Color(255,165,0),
@@ -155,11 +155,16 @@ class Screamer():
             time.sleep(countDownTime)
 
 
+
+
     def Play(self, name = "Kyle"):
         print(f"{name} started playing")
         self.StartCountDown()
         highScore = self.Listen()
         print(f"highscore: {highScore}")
+        self.Surge(self.ScoreToPercent(highScore))
+        self.Visualize("green")
+        time.sleep(5)
         self.TurnLightsOff()
         return {
             "name": name,

@@ -1,76 +1,53 @@
-from guizero import App, Text, TextBox, PushButton, Combo
+from guizero import * 
 from time import sleep
 import re
+from screamer import Screamer
 
-def start_game():
-    game.hide()
-    leaderboard.hide()
-    username.hide()
+class Gui():
+    def __init__(self):
+        print("initing started")
+        self.screamer = Screamer()
+        self.app = App(title="Throater")
+        self.app.full_screen=True
+        welcome_message = Text(self.app, text="Screamer", size=40, font="Times New Roman", color="red") 
+        self.game = PushButton(self.app, command=self.play_game, text="Play game")
+        self.leaderboard = PushButton(self.app, command=self.show_leaderboard, text="Leaderboard")
+        self.app.display()
+        self.Lapp = App(title="Leaderboard")
+        self.Lapp.full_screen=True
+        self.curName = "Platypus"
+        self.curScore = "1234"
+        self.begin = PushButton(self.app, command=self.start_game, text="Start Screaming")  
+        self.namesDropDownMenu = Combo(self.app, options=names)
+        self.highScore = Text(self.app, text=self.curName + " - " + self.curScore, size=12)
+        print("done initing")
 
-#def save_to_file():
-    #MAKE THIS BITCH OPEN A FILE AND SAVE NAME IN IT
-    #MAKE SURE NAME DOES NOT ALREADY EXIST
+    def start_game(self):
+        self.game.hide()
+        self.leaderboard.hide()
+        nameScore = self.screamer.Play(self.namesDropDownMenu.value)
+        self.curName = nameScore["name"]
+        self.curScore = nameScore["score"]
+        self.begin.hide()
+        self.namesDropDownMenu.hide()
+        self.highScore = Text(self.app, text=str(self.curName) + " - " + str(self.curScore), size=20, color="purple")
 
-def counter():
-    bitch.value = int(bitch.value) + 1
+    def show_leaderboard(self):
+        self.leaderboard.hide()
+        stats_file = open("stats.txt", "r")
+        stats = stats_file.readlines()
+        stats.sort(key=lambda temp : list(
+            map(int, re.findall(r'\d+', temp)))[0])
+        stats.reverse()
+        first = Text(self.Lapp, "1st - " + stats[0], color="#FFD700", bg="black")
+        second = Text(self.Lapp, "2nd - " + stats[1], color="#C0C0C0", bg="black")
+        third = Text(self.Lapp, "3rd - " + stats[2], color="#CD7F32", bg="black")
+        stats_file.close()
 
-def show_leaderboard():
-    leaderboard.hide()
-    stats_file = open("stats.txt", "r")
-    stats = stats_file.readlines()
-    stats.sort(key=lambda temp : list(
-        map(int, re.findall(r'\d+', temp)))[0])
-    stats.reverse()
-    first = Text(app, "1st - " + stats[0], color="#FFD700", bg="black")
-    second = Text(app, "2nd - " + stats[1], color="#C0C0C0", bg="black")
-    third = Text(app, "3rd - " + stats[2], color="#CD7F32", bg="black")
-    stats_file.close()
-    bitch = Text(app, text="0", visible=False)
-    bitch.repeat(1000,counter)
-    print(game.value)
-    if game.value == 1 :
-        first.hide()
-        second.hide()
-        third.hide()
-
-"""
-def add_name(new_name): #Add function that adds name to file
-    #names_file = open("names.txt", "a")
-    #names_file.write(new_name.value) 
-    #names_file.close()
-    print("ADD NAME STARTED")
-    with open("names.txt", "r") as f:
-         names = [line.strip() for line in f]
-    # FIXME VET THE NAME HERE
-    if new_name.value in names:
-        print("NAME ALREADY EXIST")
-        return
-
-    with open("names.txt", "a") as f:
-        f.write(new_name.value)
-        print(f"wrote new name {new_name.value}")
-    print("ADD NAME FINISHED")
-
-"""    
-
-
-def play_game():
-    game.hide()
-    leaderboard.hide()
-    #new_name = TextBox(app)
-    #add = PushButton(app, command=add_name(new_name), text="Add New Name")
-    with open("names.txt", "r") as f:
-        names = [line.strip() for line in f]
-    namesDropDownMenu = Combo(app, options=names)
-    begin = PushButton(app, command=start_game, text="Start Screaming")  
-    
-
-
-
-
-app = App(title="Throater")
-welcome_message = Text(app, text="Scream at a bitch", size=40, font="Times New Roman", color="red") 
-game = PushButton(app, command=play_game, text="Play game")
-leaderboard = PushButton(app, command=show_leaderboard, text="Leaderboard")
-#display_leaderboard = PushButton(app, command=show_leaderboard, text="Leaderboard")
-app.display()
+    def play_game(self):
+        self.game.hide()
+        self.leaderboard.hide()
+        with open("names.txt", "r") as f:
+            names = [line.strip() for line in f]
+        self.namesDropDownMenu = Combo(self.app, options=names)
+        self.begin = PushButton(self.app, command=self.start_game, text="Start Screaming")  
