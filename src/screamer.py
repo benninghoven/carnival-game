@@ -2,6 +2,7 @@ import numpy as np
 import sounddevice as sd
 from rpi_ws281x import *
 import time
+import random
 
 
 DEBUG = False
@@ -18,6 +19,7 @@ COLORS = {
 
 class Screamer():
     def __init__(self):
+        print("screamer screamin")
         # Mic
         self.maxVolume = 277
         self.volumeList = []
@@ -31,6 +33,7 @@ class Screamer():
             self.LED_BRIGHTNESS = 5
         self.LED_INVERT     = False   # True to invert the signal (when using NPN transistor level shift)
         self.LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
+        self.AFK = True
         self.strip = Adafruit_NeoPixel(
                                 self.LED_COUNT, 
                                 self.LED_PIN, 
@@ -103,31 +106,37 @@ class Screamer():
             if self.dict[i]:
                 self.dict[i] = False
 
-    def Rainbow(self, duration = 3):
-        self.SetLightsAllTrue()
+    def StartUp(self, duration = 3):
+        print("STARTING UP")
+        self.strip.setBrightness(0);
         t_end = time.time() + duration # 10 seconds
         size = len(COLORS)
         percents = []
         for i in range(0,size):
             percents.append(int((i/size) * 100))
-        while time.time() < t_end:
-            for i in range(0,self.LED_COUNT):
-                if i <= percents[1]:
-                    self.strip.setPixelColor(i, COLORS["red"])
-                elif i <= percents[2]:
-                    self.strip.setPixelColor(i, COLORS["orange"])
-                elif i <= percents[3]:
-                    self.strip.setPixelColor(i, COLORS["yellow"])
-                elif i <= percents[4]:
-                    self.strip.setPixelColor(i, COLORS["green"])
-                elif i <= percents[5]:
-                    self.strip.setPixelColor(i, COLORS["blue"])
-                elif i <= percents[6]:
-                    self.strip.setPixelColor(i, COLORS["purple"])
-                else:
-                    self.strip.setPixelColor(i, COLORS["pink"])
-
+        for i in range(0,self.LED_COUNT):
+            if i <= percents[1]:
+                self.strip.setPixelColor(i, COLORS["pink"])
+            elif i <= percents[2]:
+                self.strip.setPixelColor(i, COLORS["purple"])
+            elif i <= percents[3]:
+                self.strip.setPixelColor(i, COLORS["blue"])
+            elif i <= percents[4]:
+                self.strip.setPixelColor(i, COLORS["green"])
+            elif i <= percents[5]:
+                self.strip.setPixelColor(i, COLORS["yellow"])
+            elif i <= percents[6]:
+                self.strip.setPixelColor(i, COLORS["orange"])
+            else:
+                self.strip.setPixelColor(i, COLORS["red"])
+        for i in range(0,255, 1):
+            self.strip.setBrightness(i);
             self.strip.show() # show is refresh
+            time.sleep(.005)
+            sleep = .1
+
+        self.Visualize("yellow")
+        print("ready")
 
     def TurnLightsOff(self):
         self.SetLightsAllTrue
@@ -165,7 +174,8 @@ class Screamer():
         self.Surge(self.ScoreToPercent(highScore))
         self.Visualize("green")
         time.sleep(5)
-        self.TurnLightsOff()
+        self.SetLightsAllTrue
+        self.Visualize(random.choice(list(COLORS.keys())))
         return {
             "name": name,
             "score": highScore

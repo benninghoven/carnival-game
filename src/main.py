@@ -1,8 +1,14 @@
 from screamer import *
 import RPi.GPIO as GPIO
+from servo import UnmuteMic
+import sys
 
 TRIG = 4
 ECHO = 17
+
+if len(sys.argv) == 2:
+    UnmuteMic()
+
 
 def SetupGPIO():
     GPIO.setmode(GPIO.BCM)
@@ -27,13 +33,15 @@ def GetDistance():
     sig_time = end-start
 
     distance = sig_time / 0.000148
+    if distance > 1000:
+        return -1
     return int(distance)
 
 def StandBack():
     print("Standing User Back")
-    minDistance= 2
-    maxDistance = 90
-    combo = 3
+    minDistance = 10
+    maxDistance = 100
+    combo = 2
     counter = 0
     tempy = 0
     while True:
@@ -51,6 +59,7 @@ def StandBack():
 
 SetupGPIO()
 s = Screamer()
+s.StartUp()
 
 while True:
     try:

@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo python3 gui.py
+sudo python3 /home/pi/carnival-game/src/main.py 1
