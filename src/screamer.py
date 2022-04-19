@@ -3,6 +3,7 @@ import sounddevice as sd
 from rpi_ws281x import *
 import time
 import random
+import RPi.GPIO as GPIO
 
 
 DEBUG = False
@@ -16,6 +17,54 @@ COLORS = {
         "pink" : Color(238,130,238),
         "death" : Color(0,0,0)
         }
+
+TRIG = 4
+ECHO = 17
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+GPIO.setup(TRIG, GPIO.OUT)
+GPIO.setup(ECHO, GPIO.IN)
+
+def Destroy():
+    GPIO.cleanup
+    print("\n💥 destroyed")
+    exit()
+
+def GetDistance():
+    GPIO.output(TRIG, True)
+    time.sleep(0.00001)
+    GPIO.output(TRIG, False)
+    while GPIO.input(ECHO) == False:
+        start = time.time()
+
+    while GPIO.input(ECHO) == True:
+        end = time.time()
+    sig_time = end-start
+
+    distance = sig_time / 0.000148
+    if distance > 1000:
+        return -1
+    return int(distance)
+
+def StandBack():
+    print("Standing User Back")
+    minDistance = 10 # CHANGE ME
+    maxDistance = 100
+    combo = 2
+    counter = 0
+    tempy = 0
+    while True:
+        distance = GetDistance()
+        print(f"{distance}")
+        if distance <= maxDistance and distance >= minDistance:
+            counter += 1
+            print(f"COMBO {counter}")
+        else:
+            counter = 0
+
+        if counter >= combo:
+            break
+        time.sleep(.1)
 
 class Screamer():
     def __init__(self):
@@ -48,6 +97,8 @@ class Screamer():
             self.dict[x] = True
         self.strip.begin()
     
+
+
     def ScoreToPercent(self,score):
         return int((score / self.maxVolume) * 100)
         
@@ -167,6 +218,7 @@ class Screamer():
 
 
     def Play(self, name = "Kyle"):
+        StandBack()
         print(f"{name} started playing")
         self.StartCountDown()
         highScore = self.Listen()

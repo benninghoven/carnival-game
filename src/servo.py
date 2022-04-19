@@ -13,4 +13,3 @@ def UnmuteMic():
     time.sleep(SLEEP)
     servo.angle = 0
 
-UnmuteMic()
