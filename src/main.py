@@ -1,18 +1,20 @@
 from screamer import *
 from servo import UnmuteMic
 import sys
+from gui import GUI
 
 if len(sys.argv) == 2:
     UnmuteMic()
 
-s = Screamer()
-s.StartUp()
+#s = Screamer()
+#s.StartUp()
+
+gui = GUI()
+
 while True:
     try:
-        nameScoreDict = s.Play("blake")
-        print(nameScoreDict["name"])
-        print(nameScoreDict["score"])
+        pass
     except KeyboardInterrupt:
-        s.TurnLightsOff()
+        gui.s.TurnLightsOff()
         Destroy()
 
